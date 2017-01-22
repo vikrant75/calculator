@@ -1,0 +1,13 @@
+.btn , .answer{
+	height: 50px;
+	width: 50px;
+}
+
+input[type=text]{
+	text-align: right;
+}
+
+.display{
+	height: 40px;
+	width: 210px;
+}
