@@ -37,6 +37,9 @@ var calculator = (function(){
 				else
 					result = value1 / value2;
 				break;
+			case "%":
+				result = value1/100;
+				break;
 		}
 		currentNumber=2;
 		number1 = result == "ERROR" ? value1 : result;
@@ -51,42 +54,74 @@ var calculator = (function(){
 	}
 
 	function _parseInput(event){
-		var value = $(event.target).text();
-
-		if($(event.target).hasClass("operator")){
+		var elem = $(event.target);
+		var value = elem.text();
+		
+		if(elem.hasClass("operator")){
 
 			var value1 = parseFloat(number1);
 			var value2 = parseFloat(number2);
 			
-			if(canSolve(value1,value2,operator))
+			if(value == "%")
+			{
+				var temp;
+
+				temp = operationDone ? value1 : ((currentNumber == 1) ? value1 : value2);
+
+				if(isNaN(temp))
+					return;
+
+				solve(temp,number2,value);
+			}
+			else if(canSolve(value1,value2,operator))
 			{
 				solve(value1,value2,operator);
 			}
 			else if(!operationDone){
-			//switch input number only if prev state was 
-			//not in solve
-			currentNumber= currentNumber == 1 ? 2: 1;	
+				//switch input number only if prev state was 
+				//not in solve
+				currentNumber= currentNumber == 1 ? 2: 1;	
 			}
 
 			//delay assignment to operator to take into account
 			//prev calculation
 			operator=value;
 		}
-		else if($(event.target).hasClass("number") || 
-				$(event.target).hasClass("decimal")){
-			
-			if(currentNumber==1){
-				if(value != '.' || (value == '.' && number1.indexOf('.') < 0 ) )
-					number1 += value;
-				_displayResult(number1);
-			}else{
+		if(elem.hasClass("sign")){
 
-				if(value != '.' || (value == '.'&& number2.indexOf('.') < 0) )
-					number2 += value;
-				_displayResult(number2);
+			var temp;
+
+			temp = operationDone ? number1 : (currentNumber == 1 ? number1 : number2);
+			
+            if(isNaN(parseFloat(temp)))
+            	return;
+
+            temp = (parseFloat(temp)*(-1)).toString();
+            _displayResult(temp);
+
+            if(operationDone || currentNumber == 1)
+            	number1 = temp;
+            else
+            	number2 = temp;			
+		}
+		else if(elem.hasClass("number") || elem.hasClass("decimal")){
+			var temp ;
+
+			temp = currentNumber == 1 ? number1 : number2
+			
+			if(value != '.' || (value == '.' && temp.indexOf('.') < 0 )){
+				temp += value;
+			}
+			
+			_displayResult(temp);
+
+			if(currentNumber==1){
+				number1 = temp;
+			}else{
+				number2 = temp;
 			}
 		}
-		else if($(event.target).hasClass("answer")){
+		else if(elem.hasClass("answer")){
 			
 			var value1 = parseFloat(number1);
 			var value2 = parseFloat(number2);
@@ -96,7 +131,7 @@ var calculator = (function(){
 			}
 
 		}
-		else if($(event.target).hasClass("clear-all")){
+		else if(elem.hasClass("clear-all")){
 			currentNumber=1;
 			number1='';
 			number2='';
