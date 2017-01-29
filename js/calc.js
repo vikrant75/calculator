@@ -46,6 +46,7 @@ var calculator = (function(){
 		number2 = '';
 		_displayResult(result);
 		operationDone=true;
+		return result;
 	}
 
 	function canSolve(value1,value2,operator){
@@ -54,6 +55,7 @@ var calculator = (function(){
 	}
 
 	function _parseInput(event){
+
 		var elem = $(event.target);
 		var value = elem.text();
 		
@@ -141,5 +143,8 @@ var calculator = (function(){
 
 	}
 
-
+	return {
+		solve:solve,
+		canSolve:canSolve
+	};
 })();
